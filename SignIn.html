@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>JS Bin</title>
+</head>
+
+<body>
+<view id="view">
+    Username: <input id="user">
+    <br/>
+    Password:
+    <input type="password" id="pass">
+
+    <button id="submit">Submit</button>
+    <h1>Posts</h1>
+    <div id="info"></div>
+
+</view>
+<view id="secondView">loggedIn</view>
+
+</body>
+<script src="https://code.jquery.com/jquery-3.1.0.js"></script>
+<script src="https://www.gstatic.com/firebasejs/3.7.2/firebase.js"></script>
+<script>
+    $(document).ready(function(){
+        // Initialize Firebase
+        $("#secondView").hide();
+        var config = {
+            apiKey: "AIzaSyDcJSR8zmcfbzHIx1NB6n-GFFtWUXap3dE",
+            authDomain: "webdevblog-ce460.firebaseapp.com",
+            databaseURL: "https://webdevblog-ce460.firebaseio.com",
+            storageBucket: "webdevblog-ce460.appspot.com",
+            messagingSenderId: "110019469771"
+        };
+        firebase.initializeApp(config);
+        var db = firebase.database();
+
+        $("#submit").click(function(){
+            firebase.auth().signInWithEmailAndPassword($("#user").val(), $("#pass").val()).catch(function(error) {
+                // Handle Errors here.
+                var errorCode = error.code;
+                var errorMessage = error.message;
+                // ...
+                if(errorMessage){
+                    alert(errorMessage);
+                }
+            }).then(function(){
+                if(firebase.auth().currentUser){
+                    $("#view").hide();
+                    $("#secondView").show();
+                }
+            })
+
+
+
+
+        });
+
+    });
+</script>
+</html>
