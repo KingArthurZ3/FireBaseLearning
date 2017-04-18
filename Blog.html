@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>JS Bin</title>
+</head>
+
+<body>
+<button id="sign-in-button">Open GoogleAuth</button>
+<button id="sign-out-button">Log out</button>
+<h1 id="display-name"></h1>
+<div id="post-content">
+    <p>Write something:
+        <textarea style="height: 100px; width: 200px" id="txt"></textarea>
+        <button id="submit-button">Submit</button>
+</div>
+</body>
+<script src="https://code.jquery.com/jquery-3.1.0.js"></script>
+<script src="https://www.gstatic.com/firebasejs/3.7.3/firebase.js"></script>
+<script>
+    // Initialize Firebase
+    var config = {
+        apiKey: "AIzaSyAIslenUNcwVLajbU6DhTeV8MJKWwGxoR4",
+        authDomain: "project--468679900955161584.firebaseapp.com",
+        databaseURL: "https://project--468679900955161584.firebaseio.com",
+        projectId: "project--468679900955161584",
+        storageBucket: "project--468679900955161584.appspot.com",
+        messagingSenderId: "772366106298"
+    };
+    firebase.initializeApp(config);
+
+</script>
+<script>
+
+    var userObj = "";
+    firebase.auth().onAuthStateChanged(onAuthStateChanged);
+    function uiRefresh(){
+        $("#display-name").text("Not Logged In");
+        //hide post-content
+        $("#post-content").hide();
+        //show sign-in-button
+        $("#sign-in-button").show();
+        //hide sign-out-button
+        $("#sign-out-button").hide();
+    }
+    function onAuthStateChanged(user){
+        if(user){
+            userObj = user
+            //set global var userObj to user
+            $("#display-name").text("Logged in: " + user.displayName);
+            //show post-content
+            $("#post-content").show();
+            //hide sign-in-button
+            $("#sign-in-button").hide();
+            //show sign-out-button
+            $("#sign-out-button").show();
+        }
+        else{
+            uiRefresh();
+        }
+
+    }
+    function writePost(uid, username, body){
+
+        var data = {
+            author: username,
+            uid: uid,
+            body: body
+        }
+        //Push data to /posts/uid/
+        firebase.database().ref('/posts/' + uid + '/').push(data);
+    }
+    $(document).ready(function(){
+
+        //hide post-content
+        $("#post-content").hide();
+        //hide sign-out-button
+        $("#sign-out-button").hide();
+        $("#sign-in-button").click(function(){
+            var provider = new firebase.auth.GoogleAuthProvider();
+            firebase.auth().signInWithPopup(provider);
+        })
+        $("#sign-out-button").click(function(){
+            firebase.auth().signOut();
+        })
+        $("#submit-button").click(function(){
+            //call writePost using userObj and value of the textarea
+            writePost(userObj.uid, userObj.displayName, $("#text").val() )
+        })
+
+    })
+</script>
+
+</html>
